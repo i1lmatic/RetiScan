@@ -1,0 +1,53 @@
+﻿CÓMO ABRIR RETINASCAN AI EN WINDOWS
+=================================
+
+1. DESCARGAR
+Descargue el proyecto de Google Drive. Haga clic derecho en el ZIP y
+seleccione "Extraer todo". Abra la carpeta extraída donde está app.py.
+
+Compruebe que dentro de models esté best_resnet50.h5. Si falta, solicítelo
+al estudiante antes de continuar.
+
+2. INSTALAR PYTHON (solo la primera vez)
+Abra este enlace:
+https://www.python.org/downloads/release/python-3119/
+
+En "Files", descargue "Windows installer (64-bit)".
+Abra el instalador, marque "Add python.exe to PATH" y pulse "Install Now".
+
+3. PREPARAR EL PROYECTO (solo la primera vez)
+En la carpeta donde está app.py, haga clic en la barra de direcciones
+superior del Explorador, escriba cmd y presione Enter.
+
+En la ventana que aparece, copie estos comandos uno por uno.
+Presione Enter después de cada uno y espere a que termine:
+
+py -3.11 -m venv .venv
+
+.venv\Scripts\python.exe -m pip install -r requirements.txt
+
+La instalación necesita Internet y puede tardar varios minutos.
+
+4. INICIAR
+En esa misma ventana, copie y presione Enter:
+
+.venv\Scripts\python.exe app.py
+
+Espere a que aparezca "Running on". Deje esa ventana abierta.
+
+5. USAR EL SISTEMA
+Abra Chrome o Edge y escriba en la barra de direcciones:
+
+http://127.0.0.1:5000
+
+Haga clic en el recuadro para subir una imagen de fondo de ojo JPG o PNG.
+Seleccione la imagen de prueba y pulse "Analizar con ResNet50V2".
+Si las muestras no funcionan, cargue una imagen desde su computadora.
+
+6. CERRAR Y VOLVER A ABRIR
+Para cerrar: vuelva a la ventana de comandos y presione Ctrl + C.
+Para abrir otro día: repita desde el paso 4, abriendo primero cmd como
+se indica en el paso 3. No necesita instalar todo nuevamente.
+
+Si aparece un error, envíe al estudiante una captura del mensaje e indique
+en qué paso ocurrió.

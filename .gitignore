@@ -1,0 +1,57 @@
+# Entornos virtuales y configuracion local
+.venv/
+venv/
+env/
+.local/
+.env
+.env.*
+!.env.example
+!.env.sample
+.python-version
+
+# Cache y archivos compilados de Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.cache/
+.ipynb_checkpoints/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+
+# Distribuciones generadas
+build/
+dist/
+*.egg-info/
+
+# Datos y modelos pesados (compartir por separado)
+/dataset/
+/data_split/
+*.h5
+*.hdf5
+*.keras
+*.ckpt
+*.ckpt.*
+*.tfrecord
+*.tfrecords
+/checkpoints/
+/logs/
+
+# Resultados regenerables y archivos temporales
+/static/resnet50_training_curves.png
+/static/resnet50_confusion_matrix.png
+/Informe_Tecnico_RetinaScan_AI.docx
+*.log
+*.tmp
+*.bak
+~$*
+
+# Configuracion del editor y del sistema operativo
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+Desktop.ini

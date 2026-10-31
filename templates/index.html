@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RetinaScan AI - Detección de Enfermedades Oculares con Deep Learning</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-base: #0B0F19;
+            --bg-surface: #111827;
+            --bg-card: rgba(17, 24, 39, 0.75);
+            --bg-card-hover: rgba(31, 41, 55, 0.85);
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --border-accent: rgba(34, 211, 238, 0.3);
+            
+            --cyan-glow: #22D3EE;
+            --cyan-dark: #0891B2;
+            --emerald: #10B981;
+            --amber: #F59E0B;
+            --rose: #F43F5E;
+            --purple: #A855F7;
+            
+            --text-main: #F3F4F6;
+            --text-muted: #9CA3AF;
+            --text-dim: #6B7280;
+            
+            --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            background-image: 
+                radial-gradient(circle at 15% 20%, rgba(8, 145, 178, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 85% 80%, rgba(168, 85, 247, 0.1) 0%, transparent 40%);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            min-height: 100vh;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Nav & Header */
+        header {
+            border-bottom: 1px solid var(--border-subtle);
+            background: rgba(11, 15, 25, 0.8);
+            backdrop-filter: blur(16px);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .header-container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--text-main);
+        }
+
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #06B6D4, #3B82F6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.35rem;
+            box-shadow: 0 0 20px rgba(34, 211, 238, 0.35);
+        }
+
+        .brand-text h1 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            background: linear-gradient(90deg, #FFFFFF, #93C5FD);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-text p {
+            font-size: 0.75rem;
+            color: var(--cyan-glow);
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.35rem 0.85rem;
+            border-radius: 9999px;
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: var(--emerald);
+            font-size: 0.8rem;
+            font-family: var(--font-mono);
+            font-weight: 600;
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--emerald);
+            box-shadow: 0 0 8px var(--emerald);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.85); }
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1300px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        /* Top Hero Banner */
+        .hero-banner {
+            background: linear-gradient(180deg, rgba(17, 24, 39, 0.6) 0%, rgba(17, 24, 39, 0.95) 100%);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            padding: 1.75rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .hero-info h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 0.35rem;
+        }
+
+        .hero-info p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            max-width: 650px;
+        }
+
+        .kpi-group {
+            display: flex;
+            gap: 1.25rem;
+        }
+
+        .kpi-card {
+            background: rgba(11, 15, 25, 0.7);
+            border: 1px solid var(--border-subtle);
+            padding: 0.75rem 1.25rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .kpi-card .num {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: var(--cyan-glow);
+            font-family: var(--font-mono);
+        }
+
+        .kpi-card .label {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        /* Nav Tabs */
+        .tab-bar {
+            display: flex;
+            gap: 0.5rem;
+            border-bottom: 1px solid var(--border-subtle);
+            margin-bottom: 2rem;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-main);
+        }
+
+        .tab-btn.active {
+            color: var(--cyan-glow);
+            border-bottom-color: var(--cyan-glow);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Diagnostic Grid */
+        .diagnostic-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 960px) {
+            .diagnostic-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Upload Panel */
+        .panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            padding: 1.75rem;
+            backdrop-filter: blur(12px);
+        }
+
+        .panel-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .dropzone {
+            border: 2px dashed rgba(34, 211, 238, 0.35);
+            background: rgba(8, 145, 178, 0.04);
+            border-radius: 16px;
+            padding: 2.5rem 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dropzone:hover, .dropzone.dragover {
+            border-color: var(--cyan-glow);
+            background: rgba(8, 145, 178, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .dropzone input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+
+        .dropzone-icon {
+            font-size: 2.75rem;
+            margin-bottom: 0.75rem;
+            display: inline-block;
+            transition: transform 0.2s;
+        }
+
+        .dropzone:hover .dropzone-icon {
+            transform: scale(1.1);
+        }
+
+        .dropzone-title {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .dropzone-desc {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* Image Preview Box */
+        .preview-container {
+            margin-top: 1.5rem;
+            display: none;
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border-accent);
+            background: #000;
+            max-height: 340px;
+        }
+
+        .preview-image {
+            width: 100%;
+            height: 320px;
+            object-fit: contain;
+            display: block;
+        }
+
+        /* Medical Scanning Effect */
+        .scanner-line {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--cyan-glow), transparent);
+            box-shadow: 0 0 15px var(--cyan-glow);
+            animation: scan 1.8s infinite ease-in-out;
+            z-index: 10;
+        }
+
+        @keyframes scan {
+            0% { top: 0%; opacity: 0; }
+            15% { opacity: 1; }
+            85% { opacity: 1; }
+            100% { top: 98%; opacity: 0; }
+        }
+
+        /* Quick Samples Buttons */
+        .sample-section {
+            margin-top: 1.75rem;
+        }
+
+        .sample-label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.75rem;
+            display: block;
+        }
+
+        .samples-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+
+        .sample-chip {
+            background: rgba(31, 41, 55, 0.6);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-main);
+            padding: 0.6rem 0.85rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .sample-chip:hover {
+            background: rgba(55, 65, 81, 0.8);
+            border-color: var(--cyan-glow);
+            transform: translateY(-1px);
+        }
+
+        .btn-analyze {
+            width: 100%;
+            margin-top: 1.5rem;
+            background: linear-gradient(135deg, #06B6D4, #2563EB);
+            color: white;
+            border: none;
+            padding: 0.9rem;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            box-shadow: 0 8px 20px rgba(6, 182, 212, 0.35);
+            transition: all 0.2s;
+        }
+
+        .btn-analyze:hover {
+            filter: brightness(1.1);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(6, 182, 212, 0.5);
+        }
+
+        .btn-analyze:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Results Panel */
+        .results-panel {
+            min-height: 480px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .placeholder-state {
+            margin: auto 0;
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-muted);
+        }
+
+        .placeholder-state .icon {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .result-content {
+            display: none;
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Result Header */
+        .diagnosis-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.25rem;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .disease-title-box h3 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: -0.01em;
+        }
+
+        .disease-title-box .en-name {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .badge-tag {
+            padding: 0.35rem 0.9rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Confidence Meter */
+        .confidence-card {
+            background: rgba(11, 15, 25, 0.6);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .conf-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .conf-number {
+            font-size: 2rem;
+            font-weight: 800;
+            font-family: var(--font-mono);
+            color: var(--cyan-glow);
+        }
+
+        /* Probabilities Breakdown */
+        .prob-section {
+            margin-bottom: 1.75rem;
+        }
+
+        .prob-row {
+            margin-bottom: 0.85rem;
+        }
+
+        .prob-row-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.35rem;
+        }
+
+        .progress-track {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 999px;
+            transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Medical Details Tabs / Accordion */
+        .medical-sheet {
+            background: rgba(11, 15, 25, 0.5);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 1.25rem;
+            font-size: 0.9rem;
+        }
+
+        .medical-sheet h4 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--cyan-glow);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .medical-sheet p {
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .medical-sheet ul {
+            list-style: none;
+            padding-left: 0;
+            margin-bottom: 1rem;
+        }
+
+        .medical-sheet ul li {
+            position: relative;
+            padding-left: 1.25rem;
+            margin-bottom: 0.4rem;
+            color: var(--text-main);
+            font-size: 0.85rem;
+        }
+
+        .medical-sheet ul li::before {
+            content: "•";
+            color: var(--cyan-glow);
+            font-weight: bold;
+            position: absolute;
+            left: 0.25rem;
+        }
+
+        /* Print Button */
+        .btn-print {
+            margin-top: 1.25rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-main);
+            padding: 0.7rem 1rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .btn-print:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Benchmark Tab Styles */
+        .benchmark-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 900px) {
+            .benchmark-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .model-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 1.5rem;
+            position: relative;
+            backdrop-filter: blur(12px);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .model-card.winner {
+            border-color: var(--cyan-glow);
+            box-shadow: 0 0 25px rgba(34, 211, 238, 0.2);
+            background: linear-gradient(180deg, rgba(8, 145, 178, 0.12) 0%, rgba(17, 24, 39, 0.8) 100%);
+        }
+
+        .winner-ribbon {
+            position: absolute;
+            top: -10px;
+            right: 15px;
+            background: linear-gradient(90deg, #06B6D4, #3B82F6);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 0.25rem 0.65rem;
+            border-radius: 999px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            box-shadow: 0 4px 10px rgba(6, 182, 212, 0.4);
+        }
+
+        .model-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .model-arch {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-bottom: 1.25rem;
+        }
+
+        .acc-stat {
+            font-size: 2.4rem;
+            font-weight: 800;
+            font-family: var(--font-mono);
+            margin-bottom: 0.5rem;
+        }
+
+        .model-card.winner .acc-stat {
+            color: var(--cyan-glow);
+        }
+
+        .model-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-top: 1rem;
+        }
+
+        /* Dataset Split Visualizer */
+        .dataset-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .dataset-table th, .dataset-table td {
+            padding: 0.85rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-subtle);
+            font-size: 0.9rem;
+        }
+
+        .dataset-table th {
+            color: var(--cyan-glow);
+            font-weight: 700;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .dataset-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            width: 22px;
+            height: 22px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <a href="/" class="brand">
+                <div class="brand-icon">👁️</div>
+                <div class="brand-text">
+                    <h1>RetinaScan AI</h1>
+                    <p>Ocular Disease Deep Learning Platform</p>
+                </div>
+            </a>
+            <div class="status-badge">
+                <span class="pulse-dot"></span>
+                <span>ResNet50V2 Engine • 89.01% Precisión</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container">
+
+        <!-- Hero Top Banner -->
+        <section class="hero-banner">
+            <div class="hero-info">
+                <h2>Panel Clínico de Inteligencia Artificial</h2>
+                <p>Clasificación automatizada de biomarcadores en imágenes retinianas de fondo de ojo para la detección temprana de Cataratas, Retinopatía Diabética y Glaucoma mediante redes neuronales convolucionales profundas.</p>
+            </div>
+            <div class="kpi-group">
+                <div class="kpi-card">
+                    <div class="num">89.01%</div>
+                    <div class="label">Precisión Test</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="num">4,217</div>
+                    <div class="label">Imágenes Kaggle</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="num">4</div>
+                    <div class="label">Patologías</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Navigation Tabs -->
+        <nav class="tab-bar">
+            <button class="tab-btn active" onclick="switchTab('tab-diag')">
+                <span>🔬</span> Diagnóstico en Vivo
+            </button>
+            <button class="tab-btn" onclick="switchTab('tab-benchmark')">
+                <span>📊</span> Comparativa de Modelos
+            </button>
+            <button class="tab-btn" onclick="switchTab('tab-dataset')">
+                <span>📁</span> Estructura del Dataset
+            </button>
+        </nav>
+
+        <!-- TAB 1: DIAGNOSTIC DASHBOARD -->
+        <div id="tab-diag" class="tab-content active">
+            <div class="diagnostic-grid">
+                
+                <!-- Left: Input & Samples -->
+                <div class="panel">
+                    <div class="panel-title">
+                        <span>Entrada de Imagen Retiniana</span>
+                        <span style="font-size:0.75rem; color:var(--text-dim);">RGB (224x224 px)</span>
+                    </div>
+
+                    <!-- Dropzone -->
+                    <div class="dropzone" id="dropzone">
+                        <input type="file" id="fileInput" accept="image/jpeg,image/png,image/jpg">
+                        <div class="dropzone-icon">📷</div>
+                        <div class="dropzone-title">Arrastra una imagen de fondo de ojo aquí</div>
+                        <div class="dropzone-desc">o haz clic para explorar en tu equipo (JPG, PNG)</div>
+                    </div>
+
+                    <!-- Image Preview with Medical Scanner -->
+                    <div class="preview-container" id="previewContainer">
+                        <div class="scanner-line" id="scannerLine"></div>
+                        <img id="previewImg" class="preview-image" alt="Previsualización de fondo de ojo">
+                    </div>
+
+                    <!-- Quick Sample Buttons -->
+                    <div class="sample-section">
+                        <span class="sample-label">O probar con muestras reales del dataset:</span>
+                        <div class="samples-grid">
+                            <button class="sample-chip" onclick="loadSample('glaucoma')">
+                                <span>🌐</span> Glaucoma
+                            </button>
+                            <button class="sample-chip" onclick="loadSample('normal')">
+                                <span>🟢</span> Retina Normal
+                            </button>
+                            <button class="sample-chip" onclick="loadSample('cataract')">
+                                <span>👁️</span> Catarata
+                            </button>
+                            <button class="sample-chip" onclick="loadSample('diabetic_retinopathy')">
+                                <span>🩸</span> Retinopatía Diab.
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Analyze Button -->
+                    <button id="analyzeBtn" class="btn-analyze" disabled onclick="executeInference()">
+                        <span>🔍 Analizar con ResNet50V2</span>
+                    </button>
+                </div>
+
+                <!-- Right: Clinical Results -->
+                <div class="panel results-panel">
+                    <div class="panel-title">
+                        <span>Dictamen Diagnóstico</span>
+                        <span id="severityTag" class="badge-tag" style="display:none;"></span>
+                    </div>
+
+                    <!-- Placeholder State -->
+                    <div id="placeholderState" class="placeholder-state">
+                        <div class="icon">🩺</div>
+                        <h3>Esperando imagen para análisis</h3>
+                        <p>Sube una fotografía retiniana o pulsa cualquiera de las muestras del dataset para ejecutar la inferencia de la red neuronal.</p>
+                    </div>
+
+                    <!-- Results State -->
+                    <div id="resultContent" class="result-content">
+                        
+                        <!-- Header -->
+                        <div class="diagnosis-header">
+                            <div class="disease-title-box">
+                                <h3 id="diseaseTitle">Glaucoma</h3>
+                                <div id="diseaseEn" class="en-name">Glaucoma</div>
+                            </div>
+                        </div>
+
+                        <!-- Confidence Meter -->
+                        <div class="confidence-card">
+                            <div>
+                                <div class="conf-label">Nivel de Confianza del Modelo</div>
+                                <div style="font-size:0.75rem; color:var(--text-dim);">Algoritmo Softmax normalizado</div>
+                            </div>
+                            <div class="conf-number" id="confNumber">99.8%</div>
+                        </div>
+
+                        <!-- Probability Distribution Bars -->
+                        <div class="prob-section">
+                            <div style="font-size:0.8rem; font-weight:700; color:var(--text-dim); text-transform:uppercase; margin-bottom:0.75rem;">
+                                Distribución de Probabilidad Multiclase:
+                            </div>
+
+                            <div class="prob-row">
+                                <div class="prob-row-header">
+                                    <span>Retina Normal</span>
+                                    <span id="prob-normal">0.0%</span>
+                                </div>
+                                <div class="progress-track">
+                                    <div id="bar-normal" class="progress-fill" style="width: 0%; background: #2ECC71;"></div>
+                                </div>
+                            </div>
+
+                            <div class="prob-row">
+                                <div class="prob-row-header">
+                                    <span>Glaucoma</span>
+                                    <span id="prob-glaucoma">0.0%</span>
+                                </div>
+                                <div class="progress-track">
+                                    <div id="bar-glaucoma" class="progress-fill" style="width: 0%; background: #9B59B6;"></div>
+                                </div>
+                            </div>
+
+                            <div class="prob-row">
+                                <div class="prob-row-header">
+                                    <span>Catarata</span>
+                                    <span id="prob-cataract">0.0%</span>
+                                </div>
+                                <div class="progress-track">
+                                    <div id="bar-cataract" class="progress-fill" style="width: 0%; background: #E67E22;"></div>
+                                </div>
+                            </div>
+
+                            <div class="prob-row">
+                                <div class="prob-row-header">
+                                    <span>Retinopatía Diabética</span>
+                                    <span id="prob-diabetic_retinopathy">0.0%</span>
+                                </div>
+                                <div class="progress-track">
+                                    <div id="bar-diabetic_retinopathy" class="progress-fill" style="width: 0%; background: #E74C3C;"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Clinical Details & Recommendations Sheet -->
+                        <div class="medical-sheet">
+                            <h4>📋 Descripción Clínica</h4>
+                            <p id="medicalDescription">Cargando análisis patológico...</p>
+
+                            <h4>🚨 Síntomas Principales</h4>
+                            <ul id="symptomsList"></ul>
+
+                            <h4>💡 Recomendación Médica</h4>
+                            <ul id="recommendationsList"></ul>
+                        </div>
+
+                        <!-- Print / Export Action -->
+                        <button class="btn-print" onclick="window.print()">
+                            <span>🖨️ Exportar Informe Clínico</span>
+                        </button>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <!-- TAB 2: BENCHMARK -->
+        <div id="tab-benchmark" class="tab-content">
+            <div class="benchmark-grid">
+                
+                <!-- Card 1: ResNet50V2 (Winner) -->
+                <div class="model-card winner">
+                    <span class="winner-ribbon">⭐ Ganador (89.01%)</span>
+                    <div>
+                        <div class="model-name">ResNet50V2</div>
+                        <div class="model-arch">Especialista Profundo • Skip Connections</div>
+                        <div class="acc-stat">89.01%</div>
+                        <div style="font-size:0.8rem; color:var(--emerald); font-weight:700;">CONVERGENCIA SALUDABLE</div>
+                    </div>
+                    <p class="model-desc">
+                        Utiliza aprendizaje residual mediante conexiones saltadas (skip connections). Esto permite entrenar más de 50 capas profundas sin degradación de gradiente, captando los micro-detalles de las lesiones vasculares y excavación papilar. Las curvas de pérdida y precisión avanzan de forma armónica.
+                    </p>
+                </div>
+
+                <!-- Card 2: MobileNetV2 -->
+                <div class="model-card">
+                    <div>
+                        <div class="model-name">MobileNetV2</div>
+                        <div class="model-arch">El Velocista • Convolución Separable</div>
+                        <div class="acc-stat" style="color:var(--amber);">81.20%</div>
+                        <div style="font-size:0.8rem; color:var(--amber); font-weight:700;">LIGERO / ALTA VELOCIDAD</div>
+                    </div>
+                    <p class="model-desc">
+                        Optimizado para dispositivos con hardware limitado reduciendo drásticamente la carga computacional mediante convoluciones separables en profundidad. Aunque es veloz, sacrificó un 8% de agudeza en detalles sutiles de la vasculatura retiniana.
+                    </p>
+                </div>
+
+                <!-- Card 3: EfficientNetB0 -->
+                <div class="model-card">
+                    <div>
+                        <div class="model-name">EfficientNetB0</div>
+                        <div class="model-arch">Escalado Compuesto • Descartado</div>
+                        <div class="acc-stat" style="color:var(--rose);">25.43%</div>
+                        <div style="font-size:0.8rem; color:var(--rose); font-weight:700;">NO CONVERGIÓ</div>
+                    </div>
+                    <p class="model-desc">
+                        Intenta equilibrar profundidad, ancho y resolución simultáneamente. Debido a su normalización interna redundante con el escalado 1/255 de los generadores, no logró converger adecuadamente en este conjunto de datos, quedando con una tasa de acierto aleatoria (25%).
+                    </p>
+                </div>
+
+            </div>
+
+            <!-- Training Strategy Details -->
+            <div class="panel">
+                <h3 style="margin-bottom:1rem; font-size:1.15rem;">Estrategia de Entrenamiento en 2 Fases (Transfer Learning)</h3>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1.5rem;">
+                    <div style="background:rgba(11,15,25,0.6); padding:1.25rem; border-radius:12px; border:1px solid var(--border-subtle);">
+                        <h4 style="color:var(--cyan-glow); margin-bottom:0.5rem;">Fase 1: Extracción de Características</h4>
+                        <p style="color:var(--text-muted); font-size:0.88rem; line-height:1.6;">
+                            • Base convolucional de ImageNet <strong>completamente congelada</strong>.<br>
+                            • Entrenamiento enfocado exclusivamente en la nueva cabeza clasificadora densa (Dense 512 + Dense 256 + Softmax).<br>
+                            • Optimizador <code>Adam (lr=1e-3)</code> durante 15 épocas con <code>EarlyStopping</code>.
+                        </p>
+                    </div>
+                    <div style="background:rgba(11,15,25,0.6); padding:1.25rem; border-radius:12px; border:1px solid var(--border-subtle);">
+                        <h4 style="color:var(--cyan-glow); margin-bottom:0.5rem;">Fase 2: Ajuste Fino (Fine-Tuning)</h4>
+                        <p style="color:var(--text-muted); font-size:0.88rem; line-height:1.6;">
+                            • Se descongelan las <strong>últimas 40 capas</strong> del modelo base ResNet50V2.<br>
+                            • Reducción de la tasa de aprendizaje a <code>Adam (lr=1e-4)</code> para evitar alterar los pesos generales aprendidos.<br>
+                            • 30 épocas con <code>ReduceLROnPlateau</code> para alcanzar la máxima precisión del <strong>89.01%</strong>.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: DATASET STRUCTURE -->
+        <div id="tab-dataset" class="tab-content">
+            <div class="panel">
+                <h3 style="margin-bottom:0.5rem; font-size:1.2rem;">División Estratificada del Dataset Ocular</h3>
+                <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1.5rem;">
+                    Partición estratificada con semilla 42 realizada mediante el script <code>split_dataset.py</code>, respetando exactamente 70% Entrenamiento, 15% Validación y 15% Prueba.
+                </p>
+
+                <table class="dataset-table">
+                    <thead>
+                        <tr>
+                            <th>Categoría Patológica</th>
+                            <th>Entrenamiento (70%)</th>
+                            <th>Validación (15%)</th>
+                            <th>Prueba (15%)</th>
+                            <th>Total Imágenes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>👁️ Cataract (Catarata)</strong></td>
+                            <td>726</td>
+                            <td>155</td>
+                            <td>157</td>
+                            <td><strong>1,038</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>🩸 Diabetic Retinopathy (Retinopatía)</strong></td>
+                            <td>768</td>
+                            <td>164</td>
+                            <td>166</td>
+                            <td><strong>1,098</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>🌐 Glaucoma</strong></td>
+                            <td>704</td>
+                            <td>151</td>
+                            <td>152</td>
+                            <td><strong>1,007</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>🟢 Normal (Retina Sana)</strong></td>
+                            <td>751</td>
+                            <td>161</td>
+                            <td>162</td>
+                            <td><strong>1,074</strong></td>
+                        </tr>
+                        <tr style="border-top:2px solid var(--border-accent); font-weight:700;">
+                            <td>TOTAL DEL DATASET</td>
+                            <td style="color:var(--cyan-glow);">2,949</td>
+                            <td style="color:var(--cyan-glow);">631</td>
+                            <td style="color:var(--cyan-glow);">637</td>
+                            <td style="color:var(--cyan-glow);">4,217</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Interactive Client-side Script -->
+    <script>
+        let selectedFile = null;
+        let selectedSample = null;
+
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('fileInput');
+        const previewContainer = document.getElementById('previewContainer');
+        const previewImg = document.getElementById('previewImg');
+        const scannerLine = document.getElementById('scannerLine');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+
+        const placeholderState = document.getElementById('placeholderState');
+        const resultContent = document.getElementById('resultContent');
+
+        // File Selection Handlers
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.classList.add('dragover');
+        });
+
+        dropzone.addEventListener('dragleave', () => {
+            dropzone.classList.remove('dragover');
+        });
+
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('dragover');
+            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                handleFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            selectedFile = file;
+            selectedSample = null;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                previewImg.src = e.target.result;
+                previewContainer.style.display = 'block';
+                analyzeBtn.disabled = false;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function loadSample(category) {
+            selectedSample = category;
+            selectedFile = null;
+
+            // Previsualizar la imagen de muestra llamando a la API
+            previewImg.src = `/sample/${category}`;
+            previewContainer.style.display = 'block';
+            analyzeBtn.disabled = false;
+
+            // Inferencia automática inmediata para feedback instantáneo
+            executeInference();
+        }
+
+        async function executeInference() {
+            if (!selectedFile && !selectedSample) return;
+
+            analyzeBtn.disabled = true;
+            analyzeBtn.innerHTML = '<span class="spinner"></span> Analizando retina...';
+            scannerLine.style.display = 'block';
+
+            const formData = new FormData();
+            if (selectedFile) {
+                formData.append('file', selectedFile);
+            } else if (selectedSample) {
+                formData.append('sample_class', selectedSample);
+            }
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    renderResults(data.result);
+                } else {
+                    alert('Error en el análisis: ' + (data.error || 'Desconocido'));
+                }
+            } catch (err) {
+                alert('Error de conexión con el servidor: ' + err.message);
+            } finally {
+                scannerLine.style.display = 'none';
+                analyzeBtn.disabled = false;
+                analyzeBtn.innerHTML = '<span>🔍 Analizar con ResNet50V2</span>';
+            }
+        }
+
+        function renderResults(res) {
+            placeholderState.style.display = 'none';
+            resultContent.style.display = 'block';
+
+            // Títulos y badges
+            document.getElementById('diseaseTitle').innerText = res.name_es;
+            document.getElementById('diseaseEn').innerText = `${res.name_en} • Severidad: ${res.severity}`;
+            
+            const sevTag = document.getElementById('severityTag');
+            sevTag.style.display = 'inline-block';
+            sevTag.style.backgroundColor = `${res.badge_color}22`;
+            sevTag.style.color = res.badge_color;
+            sevTag.style.border = `1px solid ${res.badge_color}66`;
+            sevTag.innerText = res.severity;
+
+            // Confianza
+            const confEl = document.getElementById('confNumber');
+            confEl.innerText = `${res.confidence}%`;
+            confEl.style.color = res.badge_color;
+
+            // Barras de probabilidades
+            const probs = res.probabilities;
+            for (const [key, val] of Object.entries(probs)) {
+                const textEl = document.getElementById(`prob-${key}`);
+                const barEl = document.getElementById(`bar-${key}`);
+                if (textEl && barEl) {
+                    textEl.innerText = `${val}%`;
+                    barEl.style.width = `${val}%`;
+                }
+            }
+
+            // Ficha médica
+            document.getElementById('medicalDescription').innerText = res.description;
+
+            const symptomsEl = document.getElementById('symptomsList');
+            symptomsEl.innerHTML = '';
+            (res.symptoms || []).forEach(sym => {
+                const li = document.createElement('li');
+                li.innerText = sym;
+                symptomsEl.appendChild(li);
+            });
+
+            const recEl = document.getElementById('recommendationsList');
+            recEl.innerHTML = '';
+            (res.recommendations || []).forEach(rec => {
+                const li = document.createElement('li');
+                li.innerText = rec;
+                recEl.appendChild(li);
+            });
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+            event.currentTarget.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+    </script>
+</body>
+</html>
